@@ -3,9 +3,7 @@
         <action>
             <actionName>run</actionName>
             <packagings>
-                <packaging>war</packaging>
-                <packaging>ear</packaging>
-                <packaging>ejb</packaging>
+                <packaging>jar</packaging>
             </packagings>
             <goals>
                 <goal>spring-boot:run</goal>

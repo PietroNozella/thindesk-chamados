@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 
 @RestController
 @RequestMapping("/api/chamados")
@@ -31,9 +30,4 @@ public class ChamadoController {
         return ResponseEntity.ok(chamado);
     }
 
-    @PostMapping("/atualizar/{id}")
-    public String atualizarChamado(@PathVariable String id, @ModelAttribute Chamado chamadoAtualizado, Model model) {
-        chamadoService.atualizarChamado(id, chamadoAtualizado);
-        return "redirect:/chamados"; // Redireciona para a página da lista de chamados
-    }
 }
