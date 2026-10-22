@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -33,6 +34,9 @@ class ChamadoAberturaTest {
 
     @MockitoBean
     private ChamadoRepository repository;
+
+    @MockitoBean
+    private MongoTemplate mongoTemplate;
 
     @Test
     void devePreencherDadosAutomaticos() throws Exception {

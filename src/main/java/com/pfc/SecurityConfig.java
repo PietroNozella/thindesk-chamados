@@ -65,6 +65,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/chamados").hasRole("SOLICITANTE")
                 .requestMatchers(HttpMethod.GET, "/api/chamados/usuario/{id}", "/api/chamados/{id}")
                     .hasAnyRole("SOLICITANTE", "TECNICO")
+                .requestMatchers(HttpMethod.PUT, "/api/chamados/{id}/resolver").hasRole("TECNICO")
                 .anyRequest().denyAll())
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(basic -> basic.authenticationEntryPoint((request, response, exception) -> {

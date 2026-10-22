@@ -1,6 +1,7 @@
 package com.pfc.thindesk.controller;
 
 import com.pfc.thindesk.dto.AbrirChamadoRequest;
+import com.pfc.thindesk.dto.ResolverChamadoRequest;
 import com.pfc.thindesk.entity.Chamado;
 import com.pfc.thindesk.service.ChamadoService;
 import java.net.URI;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,5 +41,11 @@ public class ChamadoController {
     @GetMapping("/{id}")
     public Chamado consultar(@PathVariable String id, Authentication autenticacao) {
         return chamadoService.consultar(id, autenticacao);
+    }
+
+    @PutMapping("/{id}/resolver")
+    public Chamado resolver(@PathVariable String id, @RequestBody ResolverChamadoRequest pedido,
+            Authentication autenticacao) {
+        return chamadoService.resolver(id, pedido, autenticacao.getName());
     }
 }
