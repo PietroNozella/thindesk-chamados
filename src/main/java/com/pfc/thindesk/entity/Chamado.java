@@ -2,6 +2,7 @@ package com.pfc.thindesk.entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.time.Instant;
 
 
 @Document(collection = "chamados")
@@ -9,11 +10,29 @@ public class Chamado{
     
     @Id
     private String id;
+    private String titulo;
+    private Instant dataAbertura;
     private String descricao;
     private String status;
     private String tipo;
     private String tecnico;
     private String usuario;
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public Instant getDataAbertura() {
+        return dataAbertura;
+    }
+
+    public void setDataAbertura(Instant dataAbertura) {
+        this.dataAbertura = dataAbertura;
+    }
 
     public String getId() {
         return id;

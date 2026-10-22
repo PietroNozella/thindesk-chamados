@@ -3,6 +3,7 @@ package com.pfc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.pfc.thindesk.entity.Chamado;
+import com.pfc.thindesk.dto.AbrirChamadoRequest;
 import com.pfc.thindesk.entity.Cliente;
 import com.pfc.thindesk.entity.HorarioAtendimento;
 import com.pfc.thindesk.service.ChamadoService;
@@ -66,13 +67,11 @@ class BackendMongoIntegrationTest {
 
     @Test
     void devePersistirOsDocumentosDaBaseNoMongoDB() {
-        Chamado chamado = new Chamado();
-        chamado.setDescricao("Verificação de persistência da base de aula.");
-        chamado.setStatus("ABERTO");
-        Chamado chamadoSalvo = chamadoService.criarChamado(chamado);
+        var pedido = new AbrirChamadoRequest("Teste de persistência", "Verificação de persistência da base de aula.");
+        Chamado chamadoSalvo = chamadoService.criarChamado(pedido, "teste-preparacao");
         assertThat(chamadoSalvo.getId()).isNotBlank();
         assertThat(mongoTemplate.findById(chamadoSalvo.getId(), Chamado.class).getDescricao())
-                .isEqualTo(chamado.getDescricao());
+                .isEqualTo(pedido.descricao());
 
         Cliente cliente = new Cliente();
         cliente.setNome("Cliente de teste");

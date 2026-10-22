@@ -62,6 +62,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.GET, "/api/autenticacao").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/chamados").hasRole("SOLICITANTE")
                 .anyRequest().denyAll())
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(basic -> basic.authenticationEntryPoint((request, response, exception) -> {
