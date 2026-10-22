@@ -1,0 +1,25 @@
+name: thindesk-chamados-testes
+
+services:
+  mongo-test:
+    image: mongo:7
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+
+  testes:
+    build:
+      context: .
+      target: build
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    environment:
+      MONGO_E2E: "true"
+      MONGO_E2E_URI: mongodb://mongo-test:27017
+    depends_on:
+      mongo-test:
+        condition: service_healthy
+    command: ["sh", "./mvnw", "-B", "-ntp", "clean", "verify"]
