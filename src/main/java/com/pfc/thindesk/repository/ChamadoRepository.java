@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface ChamadoRepository extends MongoRepository<Chamado, String> {
+    List<Chamado> findByUsuarioOrderByDataAberturaDesc(String usuario);
     List<Chamado> findByStatus(String status);
     
     
