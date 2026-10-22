@@ -177,8 +177,9 @@ O comando usa o [Newman oficial do Postman](https://github.com/postmanlabs/newma
 
 ## Branches e histórico
 
-Cada etapa tem uma branch e um commit próprio. As branches foram encadeadas
-localmente para permitir a execução completa sem fazer merge na `main`:
+Cada etapa tem uma branch própria, integrada à `main` por um PR com commit de
+merge. As branches são preservadas para consulta. A tabela registra a base de
+desenvolvimento de cada tarefa:
 
 | Branch | Base da comparação | Escopo |
 | --- | --- | --- |
@@ -190,13 +191,13 @@ localmente para permitir a execução completa sem fazer merge na `main`:
 | `test/fluxo-integrado-chamados` | `feat/resolucao-chamados` | E2E com MongoDB e comando de testes. |
 | `docs/demonstracao-api` | `test/fluxo-integrado-chamados` | Documentação da API, coleção e preparação local. |
 
-A branch `docs/demonstracao-api` reúne a versão completa. Exemplo para conferir
+A `main` reúne a versão completa. Exemplo para conferir
 somente a tarefa de consulta: `git diff feat/abertura-chamados..feat/consulta-chamados`.
-Os PRs devem comparar cada etapa com sua base correspondente, ou entrar em
-sequência na `main`.
+Os PRs entram em sequência na `main`, para que o diff de cada um mostre somente
+as mudanças da respectiva tarefa.
 
-A `main` conserva a base de aula importada do `thindesk.zip`, com WAR, Java 23 e
-telas originais. A preparação mudou para Java 21/JAR e removeu as telas.
+O commit inicial `15e5042` conserva a base de aula importada do `thindesk.zip`,
+com WAR, Java 23 e telas originais. A preparação mudou para Java 21/JAR e removeu as telas.
 O SHA-256 do ZIP registrado na importação é:
 
 ```text
