@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,6 +31,9 @@ class ChamadoConsultaTest {
 
     @MockitoBean
     private ChamadoRepository repository;
+
+    @MockitoBean
+    private MongoTemplate mongoTemplate;
 
     private Chamado chamado(String usuario) {
         Chamado chamado = new Chamado();

@@ -12,6 +12,8 @@ public class Chamado{
     private String id;
     private String titulo;
     private Instant dataAbertura;
+    private Instant dataResolucao;
+    private String solucao;
     private String descricao;
     private String status;
     private String tipo;
@@ -32,6 +34,22 @@ public class Chamado{
 
     public void setDataAbertura(Instant dataAbertura) {
         this.dataAbertura = dataAbertura;
+    }
+
+    public Instant getDataResolucao() {
+        return dataResolucao;
+    }
+
+    public void setDataResolucao(Instant dataResolucao) {
+        this.dataResolucao = dataResolucao;
+    }
+
+    public String getSolucao() {
+        return solucao;
+    }
+
+    public void setSolucao(String solucao) {
+        this.solucao = solucao;
     }
 
     public String getId() {
