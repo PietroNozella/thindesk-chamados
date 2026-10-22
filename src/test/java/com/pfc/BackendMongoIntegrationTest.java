@@ -54,6 +54,7 @@ class BackendMongoIntegrationTest {
         properties.add("spring.data.mongodb.database", () -> DATABASE);
         properties.add("spring.security.user.name", () -> "teste-preparacao");
         properties.add("spring.security.user.password", () -> UUID.randomUUID().toString());
+        properties.add("thindesk.security.tecnico.password", () -> UUID.randomUUID().toString());
     }
 
     @AfterAll

@@ -27,6 +27,7 @@ services:
       MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/thindesk_chamados}
       MONGODB_DATABASE: ${MONGODB_DATABASE:-thindesk_chamados}
       THINDESK_PASSWORD: ${THINDESK_PASSWORD:?Preencha THINDESK_PASSWORD no arquivo .env}
+      THINDESK_TECNICO_PASSWORD: ${THINDESK_TECNICO_PASSWORD:?Preencha THINDESK_TECNICO_PASSWORD no arquivo .env}
 
 volumes:
   mongo-data:
