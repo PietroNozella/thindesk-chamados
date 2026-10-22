@@ -1,0 +1,32 @@
+name: thindesk-chamados
+
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "127.0.0.1:27020:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:8082:8082"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SERVER_PORT: 8082
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/thindesk_chamados}
+      MONGODB_DATABASE: ${MONGODB_DATABASE:-thindesk_chamados}
+      THINDESK_PASSWORD: ${THINDESK_PASSWORD:?Preencha THINDESK_PASSWORD no arquivo .env}
+
+volumes:
+  mongo-data:
