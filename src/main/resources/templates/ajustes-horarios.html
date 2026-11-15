@@ -1,0 +1,41 @@
+<section th:fragment="content" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <h1>Horário de atendimento</h1>
+    <p class="text-muted">Cadastre os intervalos de atendimento de cada setor no mesmo dia.</p>
+    <div th:if="${ok}" class="alert alert-success" role="status" th:text="${ok}"></div>
+    <form th:action="@{/ajustes-horarios/salvar}" th:object="${novoHorario}" method="post" class="card card-body mb-4"
+          sec:authorize="hasAnyRole('ADMINISTRADOR', 'OPERADOR')">
+        <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
+            <ul class="mb-0"><li th:each="erro : ${#fields.allErrors()}" th:text="${erro}"></li></ul>
+        </div>
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3"><label for="setor" class="form-label">Setor</label>
+                <input id="setor" th:field="*{setor}" class="form-control" required maxlength="100"></div>
+            <div class="col-md-3"><label for="diaSemana" class="form-label">Dia</label>
+                <select id="diaSemana" th:field="*{diaSemana}" class="form-select" required>
+                    <option value="">Selecione</option><option th:each="dia : ${diasSemana}" th:value="${dia}" th:text="${dia}"></option>
+                </select></div>
+            <div class="col-6 col-md-2"><label for="horarioInicio" class="form-label">Início</label>
+                <input type="time" id="horarioInicio" th:field="*{horarioInicio}" class="form-control" required></div>
+            <div class="col-6 col-md-2"><label for="horarioFim" class="form-label">Fim</label>
+                <input type="time" id="horarioFim" th:field="*{horarioFim}" class="form-control" required></div>
+            <div class="col-md-2"><button type="submit" class="btn btn-primary">Salvar horário</button></div>
+        </div>
+    </form>
+    <p th:if="${#lists.isEmpty(horarios)}" class="alert alert-info">Nenhum horário cadastrado.</p>
+    <div class="table-responsive" th:unless="${#lists.isEmpty(horarios)}">
+        <table class="table table-striped align-middle">
+            <thead><tr><th scope="col">Setor</th><th scope="col">Dia</th><th scope="col">Início</th><th scope="col">Fim</th>
+                <th scope="col" sec:authorize="hasAnyRole('ADMINISTRADOR', 'OPERADOR')">Ações</th></tr></thead>
+            <tbody><tr th:each="horario : ${horarios}">
+                <td th:text="${horario.setor}"></td><td th:text="${horario.diaSemana}"></td>
+                <td th:text="${horario.horarioInicio}"></td><td th:text="${horario.horarioFim}"></td>
+                <td sec:authorize="hasAnyRole('ADMINISTRADOR', 'OPERADOR')">
+                    <form th:action="@{/ajustes-horarios/deletar/{id}(id=${horario.id})}" method="post"
+                          onsubmit="return confirm('Excluir este horário?');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Excluir</button>
+                    </form>
+                </td>
+            </tr></tbody>
+        </table>
+    </div>
+</section>

@@ -1,0 +1,80 @@
+/* Estilos adicionais para páginas com sidebar */
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: row;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background-color: #343a40;
+    color: white;
+    min-height: 100vh;
+}
+
+#sidebar a {
+    color: white;
+    text-decoration: none;
+}
+
+#sidebar a:hover {
+    background-color: #495057;
+    color: white;
+}
+
+#sidebar .nav-item .submenu {
+    display: none;
+    padding-left: 1.5rem;
+}
+
+#sidebar .nav-item.open .submenu {
+    display: block;
+}
+
+#content {
+    flex-grow: 1;
+    min-width: 0;
+    padding: 20px;
+}
+
+.ticket-description {
+    max-width: 480px;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.ticket-form {
+    max-width: 900px;
+}
+
+@media (max-width: 767.98px) {
+    #sidebar {
+        position: fixed;
+        visibility: hidden;
+        overflow-y: auto;
+        left: -250px;
+        top: 0;
+        height: 100%;
+        z-index: 1000;
+        transition: all 0.3s;
+    }
+
+    #sidebar.active {
+        left: 0;
+        visibility: visible;
+    }
+
+    #content {
+        margin-left: 0;
+        padding-top: 65px;
+    }
+
+    .toggle-btn {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1100;
+        cursor: pointer;
+    }
+}

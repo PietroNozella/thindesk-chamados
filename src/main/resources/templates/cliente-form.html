@@ -1,0 +1,17 @@
+<section th:fragment="content" xmlns:th="http://www.thymeleaf.org">
+    <h1 th:text="${cliente.id == null ? 'Novo cliente' : 'Editar cliente'}"></h1>
+    <form th:action="${cliente.id == null} ? @{/clientes/novo} : @{/clientes/editar/{id}(id=${cliente.id})}"
+          th:object="${cliente}" method="post" class="card card-body ticket-form mt-3">
+        <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
+            <ul class="mb-0"><li th:each="erro : ${#fields.allErrors()}" th:text="${erro}"></li></ul>
+        </div>
+        <div class="mb-3"><label for="nome" class="form-label">Nome</label>
+            <input id="nome" th:field="*{nome}" class="form-control" required maxlength="150" th:errorclass="is-invalid"></div>
+        <div class="mb-3"><label for="telefone" class="form-label">Telefone (opcional)</label>
+            <input id="telefone" th:field="*{telefone}" type="tel" class="form-control" maxlength="30" th:errorclass="is-invalid"></div>
+        <div class="mb-3"><label for="setor" class="form-label">Setor</label>
+            <input id="setor" th:field="*{setor}" class="form-control" required maxlength="100" th:errorclass="is-invalid"></div>
+        <div class="d-flex gap-2"><button type="submit" class="btn btn-primary">Salvar cliente</button>
+            <a th:href="@{/clientes}" class="btn btn-outline-secondary">Voltar</a></div>
+    </form>
+</section>

@@ -1,0 +1,13 @@
+<section th:fragment="content" xmlns:th="http://www.thymeleaf.org">
+    <h1>Trocar senha</h1>
+    <p class="text-muted">Após salvar, entre novamente com a nova senha. As outras sessões da sua conta também serão encerradas.</p>
+    <div th:if="${erro}" class="alert alert-danger" role="alert" th:text="${erro}"></div>
+    <form th:action="@{/minha-senha}" method="post" class="card card-body ticket-form">
+        <div class="mb-3"><label for="senhaAtual" class="form-label">Senha atual</label>
+            <input id="senhaAtual" name="senhaAtual" type="password" autocomplete="current-password" class="form-control" required maxlength="72"></div>
+        <div class="mb-3"><label for="senhaNova" class="form-label">Nova senha (mínimo de 8 caracteres)</label>
+            <input id="senhaNova" name="senhaNova" type="password" autocomplete="new-password" class="form-control" required minlength="8" maxlength="72"></div>
+        <div class="d-flex gap-2"><button type="submit" class="btn btn-primary">Salvar senha</button>
+            <a th:href="@{/}" class="btn btn-outline-secondary">Voltar</a></div>
+    </form>
+</section>

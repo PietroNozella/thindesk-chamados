@@ -1,9 +1,0 @@
-.git
-.env
-.env.*
-target
-*.log
-.idea
-.vscode
-postman/*.local.postman_environment.json
-.local

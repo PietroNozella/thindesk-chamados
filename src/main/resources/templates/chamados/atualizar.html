@@ -1,0 +1,47 @@
+<section th:fragment="content" xmlns:th="http://www.thymeleaf.org">
+    <h1 th:text="${chamado.id == null ? 'Novo chamado' : 'Editar chamado'}">Chamado</h1>
+    <p class="text-muted">Preencha a descrição, o tipo e o solicitante. O técnico pode ser atribuído depois.</p>
+    <div th:if="${erro}" class="alert alert-warning" role="alert">
+        <p th:text="${erro}"></p>
+        <a th:href="@{/chamados/atualizar/{id}(id=${chamado.id})}">Recarregar chamado</a>
+    </div>
+    <form th:action="${chamado.id == null} ? @{/chamados/novo} : @{/chamados/atualizar/{id}(id=${chamado.id})}"
+          th:object="${chamado}" method="post" class="card card-body ticket-form">
+        <input th:if="${chamado.id != null}" type="hidden" th:field="*{revisao}">
+        <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
+            <p class="mb-1">Confira os campos antes de salvar.</p>
+            <ul class="mb-0"><li th:each="erro : ${#fields.allErrors()}" th:text="${erro}"></li></ul>
+        </div>
+        <div class="mb-3">
+            <label for="descricao" class="form-label">Descrição</label>
+            <textarea id="descricao" th:field="*{descricao}" class="form-control" rows="4" maxlength="2000" required
+                      th:errorclass="is-invalid" aria-describedby="descricao-ajuda"></textarea>
+            <div id="descricao-ajuda" class="form-text">Descreva o problema em até 2000 caracteres.</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select id="status" th:field="*{status}" class="form-select" required th:errorclass="is-invalid">
+                    <option value="">Selecione</option>
+                    <option th:each="opcao : ${statusDisponiveis}" th:value="${opcao.key}" th:text="${opcao.value}"></option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="tipo" class="form-label">Tipo</label>
+                <input id="tipo" type="text" th:field="*{tipo}" class="form-control" maxlength="100" required th:errorclass="is-invalid">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="tecnico" class="form-label">Técnico (opcional)</label>
+                <input id="tecnico" type="text" th:field="*{tecnico}" class="form-control" maxlength="100" th:errorclass="is-invalid">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="usuario" class="form-label">Solicitante</label>
+                <input id="usuario" type="text" th:field="*{usuario}" class="form-control" maxlength="100" required th:errorclass="is-invalid">
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" th:disabled="${conflito}">Salvar chamado</button>
+            <a th:href="@{/chamados}" class="btn btn-outline-secondary">Voltar</a>
+        </div>
+    </form>
+</section>

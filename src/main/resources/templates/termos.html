@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Termo de Uso | Thindesk</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5" style="max-width: 720px">
+        <h2>Termo de Uso <small class="text-muted" th:text="'(versão ' + ${versao} + ')'"></small></h2>
+        <p>Este sistema é de uso institucional. Ao acessá-lo, você se compromete a:</p>
+        <ul>
+            <li>utilizar as credenciais de forma pessoal e intransferível;</li>
+            <li>registrar apenas informações verídicas nos chamados e cadastros;</li>
+            <li>não tentar acessar áreas ou dados sem permissão do seu perfil.</li>
+        </ul>
+        <p>O uso indevido pode gerar bloqueio da conta e registro em auditoria.</p>
+        <a th:href="@{/login}" class="btn btn-secondary">Voltar</a>
+    </div>
+</body>
+</html>
