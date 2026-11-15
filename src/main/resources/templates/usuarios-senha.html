@@ -1,0 +1,15 @@
+<section th:fragment="content" xmlns:th="http://www.thymeleaf.org">
+    <h1>Redefinir senha</h1>
+    <p>Conta: <strong th:text="${alvo.username}"></strong> — <span th:text="${alvo.nome + ' ' + alvo.sobrenome}"></span></p>
+    <p class="text-muted">Confirme a identidade do usuário antes de continuar. As sessões anteriores dele serão encerradas.</p>
+    <div th:if="${erro}" class="alert alert-danger" role="alert" th:text="${erro}"></div>
+    <form th:action="@{/usuarios/{id}/senha(id=${alvo.id})}" method="post" class="card card-body ticket-form">
+        <div class="mb-3"><label for="senhaAtual" class="form-label">Sua senha de administrador</label>
+            <input id="senhaAtual" name="senhaAtual" type="password" autocomplete="current-password" class="form-control" required maxlength="72"></div>
+        <div class="mb-3"><label for="senhaNova" class="form-label">Nova senha do usuário</label>
+            <input id="senhaNova" name="senhaNova" type="password" autocomplete="new-password" class="form-control" required minlength="8" maxlength="72"></div>
+        <p class="text-muted">Informe a nova senha ao usuário por um canal privado. Ela não será exibida após salvar.</p>
+        <div class="d-flex gap-2"><button type="submit" class="btn btn-primary">Redefinir senha</button>
+            <a th:href="@{/usuarios}" class="btn btn-outline-secondary">Voltar</a></div>
+    </form>
+</section>

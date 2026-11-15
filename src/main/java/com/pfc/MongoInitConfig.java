@@ -25,5 +25,8 @@ public class MongoInitConfig implements CommandLineRunner {
         if (!mongoTemplate.collectionExists("horariosAtendimento")) {
             mongoTemplate.createCollection("horariosAtendimento");
         }
+        if (!mongoTemplate.collectionExists("auditoria")) {
+            mongoTemplate.createCollection("auditoria");
+        }
     }
 }

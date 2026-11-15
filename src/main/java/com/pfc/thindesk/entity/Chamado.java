@@ -1,8 +1,11 @@
 package com.pfc.thindesk.entity;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.time.Instant;
 
 
 @Document(collection = "chamados")
@@ -10,50 +13,33 @@ public class Chamado{
     
     @Id
     private String id;
-    private String titulo;
-    private Instant dataAbertura;
-    private Instant dataResolucao;
-    private String solucao;
+    @PositiveOrZero(message = "A revisão do chamado é inválida.")
+    private Long revisao;
+    @NotBlank(message = "Informe a descrição do chamado.")
+    @Size(max = 2000, message = "A descrição deve ter até 2000 caracteres.")
     private String descricao;
+    @NotBlank(message = "Selecione o status.")
+    @Pattern(regexp = "ABERTO|EM_ANDAMENTO|CONCLUIDO|CANCELADO", message = "Selecione um status válido.")
     private String status;
+    @NotBlank(message = "Informe o tipo do chamado.")
+    @Size(max = 100, message = "O tipo deve ter até 100 caracteres.")
     private String tipo;
+    @Size(max = 100, message = "O técnico deve ter até 100 caracteres.")
     private String tecnico;
+    @NotBlank(message = "Informe o solicitante.")
+    @Size(max = 100, message = "O solicitante deve ter até 100 caracteres.")
     private String usuario;
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
-    public Instant getDataAbertura() {
-        return dataAbertura;
-    }
-
-    public void setDataAbertura(Instant dataAbertura) {
-        this.dataAbertura = dataAbertura;
-    }
-
-    public Instant getDataResolucao() {
-        return dataResolucao;
-    }
-
-    public void setDataResolucao(Instant dataResolucao) {
-        this.dataResolucao = dataResolucao;
-    }
-
-    public String getSolucao() {
-        return solucao;
-    }
-
-    public void setSolucao(String solucao) {
-        this.solucao = solucao;
-    }
 
     public String getId() {
         return id;
+    }
+
+    public Long getRevisao() {
+        return revisao;
+    }
+
+    public void setRevisao(Long revisao) {
+        this.revisao = revisao;
     }
 
     public void setId(String id) {

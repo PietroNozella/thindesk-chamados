@@ -1,51 +1,33 @@
 package com.pfc.thindesk.controller;
 
-import com.pfc.thindesk.dto.AbrirChamadoRequest;
-import com.pfc.thindesk.dto.ResolverChamadoRequest;
 import com.pfc.thindesk.entity.Chamado;
 import com.pfc.thindesk.service.ChamadoService;
-import java.net.URI;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/chamados")
 public class ChamadoController {
 
-    private final ChamadoService chamadoService;
-
-    public ChamadoController(ChamadoService chamadoService) {
-        this.chamadoService = chamadoService;
-    }
+    @Autowired
+    private ChamadoService chamadoService;
 
     @PostMapping
-    public ResponseEntity<Chamado> criarChamado(@RequestBody AbrirChamadoRequest pedido,
-            Authentication autenticacao) {
-        Chamado chamado = chamadoService.criarChamado(pedido, autenticacao.getName());
-        return ResponseEntity.created(URI.create("/api/chamados/" + chamado.getId())).body(chamado);
+    public Chamado criarChamado(@Valid @RequestBody Chamado chamado) {
+        return chamadoService.criarChamado(chamado);
     }
 
-    @GetMapping("/usuario/{id}")
-    public List<Chamado> listarPorUsuario(@PathVariable String id, Authentication autenticacao) {
-        return chamadoService.listarPorUsuario(id, autenticacao);
+    @GetMapping
+    public List<Chamado> listarChamados() {
+        return chamadoService.listarChamados();
     }
 
-    @GetMapping("/{id}")
-    public Chamado consultar(@PathVariable String id, Authentication autenticacao) {
-        return chamadoService.consultar(id, autenticacao);
-    }
-
-    @PutMapping("/{id}/resolver")
-    public Chamado resolver(@PathVariable String id, @RequestBody ResolverChamadoRequest pedido,
-            Authentication autenticacao) {
-        return chamadoService.resolver(id, pedido, autenticacao.getName());
+    @PutMapping("/{id}")
+    public ResponseEntity<Chamado> atualizarChamado(@PathVariable String id, @Valid @RequestBody Chamado chamadoAtualizado) {
+        Chamado chamado = chamadoService.atualizarChamado(id, chamadoAtualizado);
+        return ResponseEntity.ok(chamado);
     }
 }

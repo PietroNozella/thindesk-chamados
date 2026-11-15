@@ -1,205 +1,154 @@
-# ThinDesk — Chamados técnicos
+# Thindesk
 
-Backend da atividade prática: abertura, acompanhamento e resolução de chamados
-com Java 21, Spring Boot 3.4.0, Spring Security e MongoDB. Não há interface gráfica.
-Os pacotes `com.pfc` e `com.pfc.thindesk` e a organização da base foram preservados.
+Sistema de controle de chamados técnicos desenvolvido com Java 21, Spring Boot 3.4.0, Thymeleaf, Bootstrap e MongoDB.
 
-## Executar e preparar o Postman
+## Funcionalidades
 
-Pré-requisitos: Docker Desktop em execução, Docker Compose e PowerShell.
-O Docker usa Java 21; não depende do JDK instalado no computador.
+- Login e logout, com aceite dos documentos legais no primeiro acesso.
+- Cadastro, consulta e edição de chamados pela interface.
+- Status: Aberto, Em andamento, Concluído e Cancelado.
+- Cancelamento que mantém o chamado para consulta.
+- Detecção de conflitos entre edição e cancelamento de chamados.
+- Cadastro, edição e exclusão de clientes.
+- Cadastro e exclusão de horários de atendimento por setor.
+- Dashboard com total de chamados e contagem por status, calculados a partir do banco.
+- Validação dos campos, proteção CSRF e controle de acesso por perfil.
+- Gestão de usuários e redefinição de senha pelo administrador, com auditoria.
+- Encerramento de sessões antigas após troca ou redefinição de senha.
 
-```powershell
-.\scripts\preparar-ambiente.ps1
-docker compose up --build -d
-docker compose ps
-```
-
-O script cria `.env` com senhas aleatórias somente se esse arquivo ainda não existir.
-Se já existir, mantém suas configurações e exige que as duas senhas estejam preenchidas.
-Também gera `postman/ThinDesk.local.postman_environment.json` com as credenciais locais.
-Para isso, lê a configuração resolvida pelo Compose, usando a mesma interpretação
-de aspas e variáveis aplicada ao contêiner.
-Esses dois arquivos são ignorados pelo Git e pelo contexto de build do Docker.
-
-No Postman, importe:
-
-1. `postman/ThinDesk.postman_collection.json`.
-2. `postman/ThinDesk.local.postman_environment.json`.
-
-Selecione o ambiente **ThinDesk - Local** e execute as requisições na ordem numerada.
-A abertura salva `chamadoId` automaticamente. A identificação do solicitante salva
-`usuarioId`, usado na listagem. A coleção inclui os cenários de erro.
-O modelo público `ThinDesk.postman_environment.json` contém senhas vazias e pode
-ser preenchido manualmente. Também é possível importar a coleção no Insomnia,
-ajustando as variáveis e a autenticação conforme a ferramenta.
-
-- API: `http://localhost:8082`.
-- MongoDB no computador: `mongodb://localhost:27020/thindesk_chamados`.
-- MongoDB dentro do Compose: `mongodb://mongo:27017/thindesk_chamados`.
-- Banco padrão: `thindesk_chamados`.
-- Volume: `thindesk-chamados_mongo-data`.
-
-Para acompanhar a inicialização: `docker compose logs --tail 50 app`.
-Ao iniciar pela primeira vez, aguarde a mensagem `Started ThindeskApplication`.
-
-## Autenticação e permissões
-
-A autenticação reutiliza o Spring Security da base, adaptado para HTTP Basic.
-As credenciais são enviadas em cada requisição, sem sessão, formulário ou cookie.
-CSRF fica desabilitado para este backend usado por Postman/Insomnia, sem cliente de navegador.
-
-| Perfil | Configuração | Permissões |
-| --- | --- | --- |
-| Solicitante | `THINDESK_USERNAME` e `THINDESK_PASSWORD` | Abrir e consultar seus chamados. |
-| Técnico | `THINDESK_TECNICO_USERNAME` e `THINDESK_TECNICO_PASSWORD` | Consultar chamados e registrar resolução. |
-
-Os dois usuários são mantidos em memória pelo Spring Security, com senhas
-codificadas com BCrypt. Os chamados ficam no MongoDB. Não foi criado um cadastro
-de usuários, pois ele não faz parte da atividade.
-
-O **nome de login é o identificador estável do solicitante**: o campo `usuario`
-do chamado e o `{id}` de `/usuario/{id}` usam esse valor. Mantenha o mesmo login
-ao reiniciar para continuar acessando os chamados anteriores.
-Os nomes precisam ser diferentes, com até 64 caracteres: letras sem acentos,
-números, ponto, hífen ou sublinhado; o primeiro deve ser letra ou número.
-As senhas não podem ser vazias e devem ter até 72 bytes em UTF-8.
-
-## Endpoints
-
-| Método | Rota | Perfil | Sucesso |
-| --- | --- | --- | --- |
-| GET | `/api/autenticacao` | Autenticado | `200`, login e perfil atuais. |
-| POST | `/api/chamados` | Solicitante | `201`, chamado e cabeçalho `Location`. |
-| GET | `/api/chamados/usuario/{id}` | Próprio solicitante ou técnico | `200`, lista por data de abertura decrescente. |
-| GET | `/api/chamados/{id}` | Próprio solicitante ou técnico | `200`, detalhes do chamado. |
-| PUT | `/api/chamados/{id}/resolver` | Técnico | `200`, chamado resolvido. |
-
-Corpo da abertura:
-
-```json
-{
-  "titulo": "Impressora sem conexão",
-  "descricao": "A impressora do setor não aparece na rede."
-}
-```
-
-Corpo da resolução:
-
-```json
-{
-  "solucao": "Configuração de rede corrigida e impressão de teste realizada."
-}
-```
-
-Título: até 150 caracteres. Descrição e solução: até 5.000 caracteres cada.
-Todos são obrigatórios e não podem conter apenas espaços. Espaços nas extremidades
-são removidos antes da gravação.
-
-O servidor gera ID, solicitante, status `ABERTO` e data de abertura.
-Na resolução, registra solução, técnico autenticado, status `RESOLVIDO` e data de resolução.
-As datas são instantes UTC, com precisão de milissegundos.
-Campos não previstos no corpo, incluindo ID, usuário, status e datas, são rejeitados.
-
-A resolução é uma atualização atômica condicionada ao status `ABERTO` no MongoDB.
-Somente a primeira tentativa pode gravar. Não existe endpoint de edição genérica
-ou reabertura. As rotas legadas de clientes, a listagem geral de chamados e
-`PUT /api/chamados/{id}` permanecem bloqueadas.
-
-| Erro | Situação |
+| Perfil | Acesso aos chamados |
 | --- | --- |
-| `400` | Dados inválidos, JSON inválido ou campos não permitidos. |
-| `401` | Credenciais ausentes ou inválidas. |
-| `403` | Perfil sem permissão, consulta de outro solicitante ou rota bloqueada. |
-| `404` | Chamado não encontrado nas operações de consulta ou resolução. |
-| `409` | Chamado fora do status `ABERTO`, incluindo tentativa de resolver novamente. |
+| Administrador | Consultar, cadastrar, editar e cancelar; também cadastra usuários. |
+| Operador | Consultar, cadastrar, editar e cancelar. |
+| Professor | Consultar a lista e o dashboard. |
 
-Esses erros retornam JSON com `status` e `mensagem`. Uma listagem sem resultados
-retorna `200` e `[]`. O técnico também pode listar um login sem chamados.
+Administradores e operadores também podem cadastrar, editar e excluir clientes e cadastrar ou excluir horários. Professores podem consultar esses registros. A gestão de usuários e a auditoria são restritas ao administrador.
 
-## Persistência
+## Recuperar acesso e trocar senha
 
-Para inspecionar os documentos sem instalar um cliente MongoDB:
+A opção **Esqueceu sua senha?** orienta a procurar o administrador da instituição. Não há envio de e-mail nem geração pública de links de recuperação.
+
+Para redefinir a senha de outra conta, o administrador deve abrir **Usuários → Redefinir senha**, confirmar a identidade da pessoa, informar sua própria senha e definir uma nova senha para ela. A nova senha deve ser entregue por um canal privado; ela não é exibida depois de salvar.
+
+Depois de entrar, o usuário pode escolher sua senha em **Trocar senha**, informando a senha atual. O administrador também usa essa opção para a própria conta. A alteração exige ao menos oito caracteres e respeita o limite de entrada do BCrypt, sem truncar a senha.
+
+Trocas e redefinições invalidam as sessões anteriores na próxima requisição, inclusive acessos à API. Uma operação que já estava em execução pode terminar. Os antigos endereços de recuperação por token retornam HTTP 410 e não alteram senhas; não é necessário apagar coleções antigas para desativá-los.
+
+Se o único administrador perder o acesso, será necessária uma intervenção do responsável pelo ambiente no banco. A aplicação não oferece recuperação pública dessa conta.
+
+## Alterações simultâneas em chamados
+
+Cada chamado possui uma `revisao`. A interface envia esse valor ao editar ou cancelar. Se outra operação já alterou o chamado, a aplicação retorna HTTP 409, mantém o texto digitado e pede que os dados sejam recarregados antes de salvar.
+
+O `PUT /api/chamados/{id}` também exige a `revisao` recebida na consulta, junto dos campos do chamado. Omitir a revisão retorna HTTP 400; usar uma revisão antiga retorna HTTP 409. Registros anteriores sem esse campo são lidos como revisão zero e recebem a primeira revisão ao serem alterados, sem migração prévia.
+
+Clientes não possuem detecção de conflito entre duas edições. Uma edição, porém, não recria um cliente que tenha sido excluído por outra operação.
+
+## Versão e semântica de versionamento
+
+Versão atual: **`1.0.0-beta`**, definida no `pom.xml`.
+
+O projeto adota o formato `MAJOR.MINOR.PATCH`, com um sufixo opcional de pré-lançamento:
+
+- **MAJOR:** alterações incompatíveis com a versão anterior.
+- **MINOR:** novas funcionalidades compatíveis.
+- **PATCH:** correções compatíveis.
+- **`-beta`:** versão de pré-lançamento, ainda em preparação para a entrega.
+
+Nesta versão, `1` identifica a primeira versão principal; os dois zeros indicam que ainda não houve incrementos de funcionalidades ou correções após essa base. A versão final poderá ser identificada como `1.0.0` depois da validação da entrega e do deploy.
+
+## Dashboard
+
+Captura da aplicação executando localmente, com dados fictícios de validação persistidos no MongoDB. As quantidades variam conforme os chamados cadastrados.
+
+![Dashboard do Thindesk com total de chamados e contagens por status](docs/images/dashboard.png)
+
+## Executar localmente
+
+Requisitos: JDK 21 ou superior e MongoDB disponível. O Maven Wrapper acompanha o projeto; não é necessário instalar Maven separadamente.
+
+Por padrão, a aplicação conecta em `mongodb://localhost:27017/thindesk` e abre em <http://localhost:8080>.
+
+No PowerShell:
 
 ```powershell
-docker compose exec mongo mongosh thindesk_chamados --quiet --eval 'db.chamados.find().toArray()'
+.\mvnw.cmd spring-boot:run
 ```
 
-Também é possível usar MongoDB Compass com a URI local indicada acima.
-Para encerrar e iniciar os serviços mantendo os dados:
+No Linux ou macOS:
 
-```powershell
-docker compose down
-docker compose up -d
+```sh
+sh mvnw spring-boot:run
 ```
 
-`down` mantém o volume. A opção `-v` remove o volume e seus dados.
+Em um banco novo, a conta administradora local padrão é `admin`, com senha `thindesk123`. Essas credenciais são apenas para desenvolvimento local. As variáveis abaixo permitem definir outro acesso antes da primeira inicialização.
 
-## Testes
-
-O comando abaixo cria um MongoDB separado, executa a suíte com Java 21 e encerra
-os contêineres de testes ao terminar. Não usa o `.env` da aplicação nem publica
-portas do banco de testes:
-
-```powershell
-.\scripts\testar-integracao.ps1
-```
-
-Os relatórios ficam em `target/surefire-reports`. Os bancos de testes têm nomes
-aleatórios com prefixos próprios e são removidos ao final. A suíte cobre o fluxo
-HTTP real, persistência, isolamento entre solicitantes, permissões, validações,
-bloqueio de alterações e duas resoluções simultâneas.
-
-Com **JDK 21** e Maven Wrapper, `.\mvnw.cmd clean verify` executa os testes sem
-MongoDB, pulando os sete testes de integração. Para incluí-los, use `MONGO_E2E=true`
-e `MONGO_E2E_URI` apontando para uma instância exclusiva de testes.
-A execução local da aplicação exige as variáveis de `.env.example` no processo;
-o Maven não carrega `.env` automaticamente. Nesse caso, altere `MONGODB_URI` para
-`mongodb://localhost:27020/thindesk_chamados` e execute `.\mvnw.cmd spring-boot:run`.
-
-Para executar os testes da coleção com Node.js, sem adicionar dependências ao projeto:
-
-```powershell
-npx.cmd --yes newman run postman/ThinDesk.postman_collection.json -e postman/ThinDesk.local.postman_environment.json --reporters cli,junit --reporter-junit-export target/newman.xml
-```
-
-O comando usa o [Newman oficial do Postman](https://github.com/postmanlabs/newman).
-
-## Verificações executadas
-
-- `scripts/testar-integracao.ps1`: 26 testes, sem falhas, erros ou testes ignorados.
-- Build e execução da aplicação com Docker Compose e Java 21.
-- Coleção executada com Newman: 17 requisições e 25 verificações aprovadas.
-- Consulta direta aos documentos no MongoDB.
-- Recriação dos contêineres da aplicação e do MongoDB, preservando o volume;
-  conferência dos campos do chamado resolvido antes e depois.
-- Revisão do backend quanto a permissões, sobrescrita e concorrência, sem bloqueios encontrados.
-
-## Branches e histórico
-
-Cada etapa tem uma branch própria, integrada à `main` por um PR com commit de
-merge. As branches são preservadas para consulta. A tabela registra a base de
-desenvolvimento de cada tarefa:
-
-| Branch | Base da comparação | Escopo |
+| Variável | Finalidade | Padrão local |
 | --- | --- | --- |
-| `chore/preparacao-backend` | `main` | Execução independente e ambiente. |
-| `feat/autenticacao` | `chore/preparacao-backend` | HTTP Basic e perfis. |
-| `feat/abertura-chamados` | `feat/autenticacao` | Abertura validada e dados automáticos. |
-| `feat/consulta-chamados` | `feat/abertura-chamados` | Consulta e isolamento por solicitante. |
-| `feat/resolucao-chamados` | `feat/consulta-chamados` | Resolução atômica e bloqueio. |
-| `test/fluxo-integrado-chamados` | `feat/resolucao-chamados` | E2E com MongoDB e comando de testes. |
-| `docs/demonstracao-api` | `test/fluxo-integrado-chamados` | Documentação da API, coleção e preparação local. |
+| `MONGODB_URI` | Endereço de conexão do MongoDB | `mongodb://localhost:27017/thindesk` |
+| `MONGODB_DATABASE` | Nome do banco | `thindesk` |
+| `PORT` | Porta HTTP | `8080` |
+| `APP_ADMIN_USERNAME` | Nome da conta administradora inicial | `admin` |
+| `APP_ADMIN_PASSWORD` | Senha da conta administradora inicial | `thindesk123` |
+| `APP_ADMIN_EMAIL` | E-mail da conta administradora inicial | `admin@thindesk.local` |
+| `APP_ADMIN_NOME` | Nome da conta administradora inicial | `Administrador` |
 
-A `main` reúne a versão completa. Exemplo para conferir
-somente a tarefa de consulta: `git diff feat/abertura-chamados..feat/consulta-chamados`.
-Os PRs entram em sequência na `main`, para que o diff de cada um mostre somente
-as mudanças da respectiva tarefa.
+A conta inicial só é criada se o nome de usuário ainda não existir. Alterar as variáveis depois disso não muda a senha de uma conta já cadastrada. Na primeira entrada, aceite os documentos legais para acessar o dashboard.
 
-O commit inicial `15e5042` conserva a base de aula importada do `thindesk.zip`,
-com WAR, Java 23 e telas originais. A preparação mudou para Java 21/JAR e removeu as telas.
-O SHA-256 do ZIP registrado na importação é:
+As variáveis devem estar no ambiente do processo; a aplicação não carrega arquivos `.env` automaticamente.
 
-```text
-CECBA3087577848DF5A975217F42AEE4821DB30B61E3D0DA326F90AB3E2E73C7
+## Gerar o executável
+
+```powershell
+.\mvnw.cmd package
+java -jar target/thindesk-1.0.0-beta.jar
 ```
+
+O JAR contém as dependências e os arquivos da interface. O MongoDB permanece como um serviço externo ao JAR.
+
+## Verificar o fluxo integrado
+
+O comando abaixo usa Node.js 22 ou superior, sem pacotes adicionais. Ele acessa uma aplicação real e cria chamados e usuários de teste; execute em uma instância local com banco separado dos dados de uso.
+
+Exemplo para iniciar uma instância de testes com um MongoDB local já disponível:
+
+```powershell
+$env:MONGODB_URI='mongodb://localhost:27017/thindesk_validacao'
+$env:MONGODB_DATABASE='thindesk_validacao'
+$env:PORT='8081'
+.\mvnw.cmd spring-boot:run
+```
+
+Em outro terminal, informe o endereço e a senha do administrador dessa instância:
+
+```powershell
+$env:THINDESK_TEST_URL='http://127.0.0.1:8081'
+$env:THINDESK_TEST_ADMIN='admin'
+$env:THINDESK_TEST_PASSWORD='thindesk123'
+node scripts/verificar-fluxo.mjs
+```
+
+O script verifica chamados, conflitos entre operações, clientes, horários, cadastro de usuários, recuperação administrada de acesso, troca de senha, bloqueio após tentativas incorretas, revogação de sessões, auditoria, CSRF, permissões e contadores do dashboard. Os dados gerados permanecem no banco de testes. Esse comando valida o fluxo por HTTP; a inspeção visual deve ser feita no navegador.
+
+## Deploy e entrega acadêmica
+
+**Deploy público: pendente.** O endereço local não substitui o link público exigido na atividade.
+
+Repositório individual: [PietroNozella/thindesk-chamados — branch feat/entrega-final](https://github.com/PietroNozella/thindesk-chamados/tree/feat/entrega-final).
+Essa branch contém a aplicação com interface desta entrega. A `main` conserva a atividade anterior de API.
+
+Para concluir a entrega:
+
+- Hospedar o JAR em um ambiente com Java 21 ou superior e configurar a conexão ao MongoDB e a conta administradora inicial.
+- Criar uma conta de demonstração com perfil Operador em **Usuários → Cadastrar usuário**.
+- Registrar aqui o endereço público e as credenciais de demonstração, sem expor a conta administradora ou as credenciais do banco.
+- Testar o login e o fluxo de chamados pelo endereço público em janela anônima.
+- Conferir que o código do GitHub, a aplicação publicada e o ZIP solicitado correspondem à mesma versão.
+
+| Item da entrega | Situação |
+| --- | --- |
+| GitHub individual | Versão com interface na branch `feat/entrega-final`, no link acima |
+| Versão e explicação | Documentadas neste README |
+| Print do dashboard | Incluído acima |
+| Link do deploy | Pendente |
+| Credenciais de demonstração do deploy | Pendentes |

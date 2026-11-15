@@ -5,8 +5,4 @@ target/
 *.log
 .idea/
 .vscode/
-*.iml
-.DS_Store
-Thumbs.db
-postman/*.local.postman_environment.json
-.local/
+output/

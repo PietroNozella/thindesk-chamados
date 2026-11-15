@@ -1,0 +1,19 @@
+<section th:fragment="content" xmlns:th="http://www.thymeleaf.org">
+    <header class="d-flex flex-wrap gap-3 justify-content-between align-items-center mb-4">
+        <h1>Usuários</h1><a th:href="@{/usuarios/novo}" class="btn btn-primary">Cadastrar usuário</a>
+    </header>
+    <div th:if="${ok}" class="alert alert-success" role="status" th:text="${ok}"></div>
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead><tr><th scope="col">Nome</th><th scope="col">Usuário</th><th scope="col">E-mail</th>
+                <th scope="col">Perfil</th><th scope="col">Ações</th></tr></thead>
+            <tbody><tr th:each="usuario : ${usuarios}">
+                <td th:text="${usuario.nome + ' ' + usuario.sobrenome}"></td><td th:text="${usuario.username}"></td>
+                <td th:text="${usuario.email}"></td><td th:text="${usuario.perfil}"></td>
+                <td><a th:if="${usuario.username != #authentication.name}" th:href="@{/usuarios/{id}/senha(id=${usuario.id})}"
+                       class="btn btn-outline-primary btn-sm">Redefinir senha</a>
+                    <a th:if="${usuario.username == #authentication.name}" th:href="@{/minha-senha}">Trocar minha senha</a></td>
+            </tr></tbody>
+        </table>
+    </div>
+</section>

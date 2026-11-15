@@ -1,0 +1,22 @@
+<nav th:fragment="sidebar" id="sidebar" aria-label="Menu principal" xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <a th:href="@{/}" class="d-block text-center py-4 fs-4 fw-bold">Thindesk</a>
+    <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" th:href="@{/}"><i class="bi bi-grid" aria-hidden="true"></i> Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/chamados}"><i class="bi bi-headset" aria-hidden="true"></i> Chamados</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/clientes}"><i class="bi bi-person" aria-hidden="true"></i> Clientes</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/ajustes-horarios}"><i class="bi bi-alarm" aria-hidden="true"></i> Horário de atendimento</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/minha-senha}"><i class="bi bi-key" aria-hidden="true"></i> Trocar senha</a></li>
+        <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+            <a class="nav-link" th:href="@{/usuarios}"><i class="bi bi-person-plus" aria-hidden="true"></i> Usuários</a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+            <a class="nav-link" th:href="@{/auditoria}"><i class="bi bi-clipboard-check" aria-hidden="true"></i> Auditoria</a>
+        </li>
+        <li class="nav-item">
+            <form th:action="@{/logout}" method="post" class="px-3 py-3">
+                <button type="submit" class="btn btn-outline-light btn-sm w-100">Sair</button>
+            </form>
+        </li>
+    </ul>
+</nav>

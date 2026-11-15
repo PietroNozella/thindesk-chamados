@@ -1,0 +1,23 @@
+<section th:fragment="content" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <header class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <h1>Clientes</h1>
+        <a th:href="@{/clientes/novo}" class="btn btn-primary" sec:authorize="hasAnyRole('ADMINISTRADOR', 'OPERADOR')">Novo cliente</a>
+    </header>
+    <div th:if="${ok}" class="alert alert-success" role="status" th:text="${ok}"></div>
+    <p th:if="${#lists.isEmpty(clientes)}" class="alert alert-info">Nenhum cliente cadastrado.</p>
+    <div th:unless="${#lists.isEmpty(clientes)}" class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead><tr><th scope="col">Nome</th><th scope="col">Telefone</th><th scope="col">Setor</th>
+                <th scope="col" sec:authorize="hasAnyRole('ADMINISTRADOR', 'OPERADOR')">Ações</th></tr></thead>
+            <tbody><tr th:each="cliente : ${clientes}">
+                <td th:text="${cliente.nome}"></td><td th:text="${cliente.telefone}"></td><td th:text="${cliente.setor}"></td>
+                <td sec:authorize="hasAnyRole('ADMINISTRADOR', 'OPERADOR')"><div class="d-flex gap-2">
+                    <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}" class="btn btn-outline-primary btn-sm">Editar</a>
+                    <form th:action="@{/clientes/deletar/{id}(id=${cliente.id})}" method="post" onsubmit="return confirm('Excluir este cliente?');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Excluir</button>
+                    </form>
+                </div></td>
+            </tr></tbody>
+        </table>
+    </div>
+</section>

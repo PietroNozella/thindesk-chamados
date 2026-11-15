@@ -1,0 +1,66 @@
+<section th:fragment="content" xmlns:th="http://www.thymeleaf.org"
+         xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <header class="d-flex flex-wrap gap-3 justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Dashboard</h1>
+            <p class="text-muted mb-0">Acompanhe a situação dos chamados técnicos.</p>
+        </div>
+        <a th:href="@{/chamados/novo}" class="btn btn-primary"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'OPERADOR')">Novo chamado</a>
+    </header>
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h6 text-muted">Total de chamados</h2>
+                <p class="display-6 mb-0" th:text="${totalChamados}">0</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-xl">
+            <div class="card h-100 border-primary"><div class="card-body">
+                <h2 class="h6 text-primary">Abertos</h2>
+                <p class="display-6 mb-0" th:text="${resumoStatus.getOrDefault('ABERTO', 0)}">0</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-xl">
+            <div class="card h-100 border-warning"><div class="card-body">
+                <h2 class="h6">Em andamento</h2>
+                <p class="display-6 mb-0" th:text="${resumoStatus.getOrDefault('EM_ANDAMENTO', 0)}">0</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-xl">
+            <div class="card h-100 border-success"><div class="card-body">
+                <h2 class="h6 text-success">Concluídos</h2>
+                <p class="display-6 mb-0" th:text="${resumoStatus.getOrDefault('CONCLUIDO', 0)}">0</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-xl">
+            <div class="card h-100"><div class="card-body">
+                <h2 class="h6 text-muted">Cancelados</h2>
+                <p class="display-6 mb-0" th:text="${resumoStatus.getOrDefault('CANCELADO', 0)}">0</p>
+            </div></div>
+        </div>
+    </div>
+    <p class="text-muted small" th:if="${totalChamados > resumoStatus.getOrDefault('ABERTO', 0) + resumoStatus.getOrDefault('EM_ANDAMENTO', 0) + resumoStatus.getOrDefault('CONCLUIDO', 0) + resumoStatus.getOrDefault('CANCELADO', 0)}">
+        O total também inclui registros antigos com status não reconhecido. Revise-os na lista de chamados.
+    </p>
+    <div class="card">
+        <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Visão dos chamados</h2>
+            <a th:href="@{/chamados}">Ver todos</a>
+        </div>
+        <div class="card-body" th:if="${#lists.isEmpty(chamados)}">
+            <p class="mb-0 text-muted">Nenhum chamado cadastrado.</p>
+        </div>
+        <div class="table-responsive" th:unless="${#lists.isEmpty(chamados)}">
+            <table class="table mb-0 align-middle">
+                <caption class="px-3">Até cinco chamados cadastrados. Consulte a lista para ver todos os registros.</caption>
+                <thead><tr><th scope="col">Descrição</th><th scope="col">Status</th><th scope="col">Técnico</th></tr></thead>
+                <tbody><tr th:each="chamado : ${chamados}">
+                    <td class="ticket-description" th:text="${chamado.descricao}"></td>
+                    <td th:text="${#strings.replace(chamado.status, '_', ' ')}"></td>
+                    <td th:text="${#strings.isEmpty(chamado.tecnico) ? 'Não atribuído' : chamado.tecnico}"></td>
+                </tr></tbody>
+            </table>
+        </div>
+    </div>
+</section>
