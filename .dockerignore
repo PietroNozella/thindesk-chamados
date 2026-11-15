@@ -1,0 +1,13 @@
+.git
+.env
+.env.*
+**/.env
+**/.env.*
+target
+*.log
+**/*.log
+.idea
+.vscode
+output
+.local
+postman/*.local.postman_environment.json

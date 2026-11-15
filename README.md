@@ -134,8 +134,47 @@ O script verifica chamados, conflitos entre operações, clientes, horários, ca
 
 **Deploy público: pendente.** O endereço local não substitui o link público exigido na atividade.
 
-Repositório individual: [PietroNozella/thindesk-chamados — branch feat/entrega-final](https://github.com/PietroNozella/thindesk-chamados/tree/feat/entrega-final).
-Essa branch contém a aplicação com interface desta entrega. A `main` conserva a atividade anterior de API.
+### Hospedagem gratuita preparada
+
+A configuração proposta usa um **Web Service Free do Render** para Java 21 e um **cluster M0 gratuito do MongoDB Atlas** para os dados. O `render.yaml` define `plan: free` explicitamente, sem discos, bancos ou outros serviços pagos. Os deploys seguintes são manuais.
+
+O plano gratuito do Render pausa o serviço após 15 minutos sem acesso. A primeira abertura pode demorar enquanto a aplicação inicia. As 750 horas mensais são compartilhadas pelos serviços gratuitos do workspace. Excedentes de banda ou build podem gerar cobrança se houver método de pagamento cadastrado; sem método de pagamento, os limites resultam em suspensão do serviço ou de novos builds. A configuração do repositório não controla a cobrança da conta. Confira as [condições atuais do Render Free](https://render.com/docs/free).
+
+O [MongoDB Atlas M0](https://www.mongodb.com/docs/atlas/tutorial/deploy-free-tier-cluster/) é um cluster gratuito. Na criação, escolha **M0 / Free**, mantendo desativados recursos e upgrades pagos.
+
+Para publicar:
+
+1. No Atlas, crie o cluster M0 e um usuário de banco com acesso de leitura e escrita ao banco `thindesk`. Copie a URI de conexão, substituindo os campos de usuário e senha. Essas credenciais são diferentes do login da aplicação.
+2. No Render, crie um **Blueprint** usando o repositório e a branch que contenham `render.yaml` e `Dockerfile`. Confira que será criado somente um Web Service com plano **Free** antes de concluir.
+3. Preencha os valores solicitados para `MONGODB_URI`, `APP_ADMIN_USERNAME`, `APP_ADMIN_PASSWORD` e `APP_ADMIN_EMAIL`. Use uma senha própria para o administrador. Esses valores ficam nas configurações do Render, fora do Git e da imagem.
+4. Na página do serviço do Render, consulte os intervalos de IP de saída e adicione-os à lista de acesso do Atlas. A conexão ao banco só funciona quando a rede e o usuário estão autorizados. Veja [Outbound IP Addresses](https://render.com/docs/outbound-ip-addresses) e [IP Access List do Atlas](https://www.mongodb.com/docs/atlas/security/ip-access-list/).
+5. Aguarde o deploy. Valide o login, o aceite, a criação e a edição de chamados pelo endereço HTTPS recebido. O healthcheck em `/esqueci-senha` verifica apenas a resposta HTTP, sem criar sessões; ele não substitui o teste do banco.
+6. Cadastre uma conta de demonstração com perfil Operador e registre o endereço e as credenciais de demonstração abaixo. Guarde as credenciais de administrador em local privado.
+
+Os segredos com `sync: false` são solicitados na criação do Blueprint. Para adicionar ou alterar segredos depois, use as configurações de ambiente do serviço no Render. A conta administradora inicial não tem a senha alterada automaticamente por um novo deploy.
+
+O contêiner executa como usuário sem privilégios, limita o heap da JVM e exige conexão ao banco e credenciais explícitas. A senha de desenvolvimento `thindesk123` é recusada no contêiner. No Render, o Blueprint ativa cookies HTTPS, tratamento dos cabeçalhos do proxy e cache dos templates. Reinícios e suspensão encerram as sessões; os chamados e usuários permanecem no Atlas.
+
+### Testar a imagem localmente
+
+Com Docker disponível e um MongoDB de testes acessível pelo contêiner:
+
+```powershell
+docker build -t thindesk:local .
+```
+
+Inicie a imagem com `MONGODB_URI`, `MONGODB_DATABASE`, `APP_ADMIN_USERNAME` e `APP_ADMIN_PASSWORD` no ambiente, publicando a porta HTTP desejada. Para verificar o limite de memória, use `--memory=512m --memory-swap=512m`. A aplicação já lê a variável `PORT` fornecida pela hospedagem.
+
+```powershell
+docker run --rm -p 8080:8080 --memory=512m --memory-swap=512m --env MONGODB_URI --env MONGODB_DATABASE --env APP_ADMIN_USERNAME --env APP_ADMIN_PASSWORD thindesk:local
+```
+
+As opções de proxy e cookie seguro do `render.yaml` se aplicam ao HTTPS do Render; não são necessárias no teste local por HTTP. O comando `node scripts/verificar-fluxo.mjs`, descrito acima, pode validar a instância local em contêiner.
+
+Na validação local da imagem, 63 verificações integradas passaram sob limite de 512 MiB e 0,1 CPU. O pico de memória foi de aproximadamente 214 MiB, sem encerramento por falta de memória. A inicialização levou cerca de 95 segundos sob essa cota de CPU. Esses resultados não substituem a validação da rede, das credenciais e do login no Render com o Atlas.
+
+Repositório individual: [PietroNozella/thindesk-chamados](https://github.com/PietroNozella/thindesk-chamados).
+A `main` contém a aplicação com interface. A configuração desta etapa está na [branch chore/deploy-gratuito](https://github.com/PietroNozella/thindesk-chamados/tree/chore/deploy-gratuito).
 
 Para concluir a entrega:
 
@@ -147,7 +186,7 @@ Para concluir a entrega:
 
 | Item da entrega | Situação |
 | --- | --- |
-| GitHub individual | Versão com interface na branch `feat/entrega-final`, no link acima |
+| GitHub individual | Aplicação com interface na `main`; configuração de hospedagem na branch `chore/deploy-gratuito` |
 | Versão e explicação | Documentadas neste README |
 | Print do dashboard | Incluído acima |
 | Link do deploy | Pendente |
