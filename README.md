@@ -132,11 +132,11 @@ O script verifica chamados, conflitos entre operações, clientes, horários, ca
 
 ## Deploy e entrega acadêmica
 
-**Deploy público: pendente.** O endereço local não substitui o link público exigido na atividade.
+**Deploy público** — [Acessar o ThinDesk no Render](https://thindesk-chamados.onrender.com/)
 
-### Hospedagem gratuita preparada
+### Hospedagem gratuita
 
-A configuração proposta usa um **Web Service Free do Render** para Java 21 e um **cluster M0 gratuito do MongoDB Atlas** para os dados. O `render.yaml` define `plan: free` explicitamente, sem discos, bancos ou outros serviços pagos. Os deploys seguintes são manuais.
+A aplicação usa um **Web Service Free do Render** para Java 21 e um **cluster M0 gratuito do MongoDB Atlas** para os dados. O `render.yaml` define `plan: free` explicitamente, sem discos, bancos ou outros serviços pagos no Render.
 
 O plano gratuito do Render pausa o serviço após 15 minutos sem acesso. A primeira abertura pode demorar enquanto a aplicação inicia. As 750 horas mensais são compartilhadas pelos serviços gratuitos do workspace. Excedentes de banda ou build podem gerar cobrança se houver método de pagamento cadastrado; sem método de pagamento, os limites resultam em suspensão do serviço ou de novos builds. A configuração do repositório não controla a cobrança da conta. Confira as [condições atuais do Render Free](https://render.com/docs/free).
 
@@ -174,20 +174,19 @@ As opções de proxy e cookie seguro do `render.yaml` se aplicam ao HTTPS do Ren
 Na validação local da imagem, 63 verificações integradas passaram sob limite de 512 MiB e 0,1 CPU. O pico de memória foi de aproximadamente 214 MiB, sem encerramento por falta de memória. A inicialização levou cerca de 95 segundos sob essa cota de CPU. Esses resultados não substituem a validação da rede, das credenciais e do login no Render com o Atlas.
 
 Repositório individual: [PietroNozella/thindesk-chamados](https://github.com/PietroNozella/thindesk-chamados).
-A `main` contém a aplicação com interface. A configuração desta etapa está na [branch chore/deploy-gratuito](https://github.com/PietroNozella/thindesk-chamados/tree/chore/deploy-gratuito).
+A `main` contém a aplicação com interface e os arquivos de configuração da hospedagem.
 
 Para concluir a entrega:
 
-- Hospedar o JAR em um ambiente com Java 21 ou superior e configurar a conexão ao MongoDB e a conta administradora inicial.
 - Criar uma conta de demonstração com perfil Operador em **Usuários → Cadastrar usuário**.
-- Registrar aqui o endereço público e as credenciais de demonstração, sem expor a conta administradora ou as credenciais do banco.
+- Registrar aqui as credenciais de demonstração, mantendo em privado a conta administradora e as credenciais do banco.
 - Testar o login e o fluxo de chamados pelo endereço público em janela anônima.
 - Conferir que o código do GitHub, a aplicação publicada e o ZIP solicitado correspondem à mesma versão.
 
 | Item da entrega | Situação |
 | --- | --- |
-| GitHub individual | Aplicação com interface na `main`; configuração de hospedagem na branch `chore/deploy-gratuito` |
+| GitHub individual | Aplicação e configuração de hospedagem na `main` |
 | Versão e explicação | Documentadas neste README |
 | Print do dashboard | Incluído acima |
-| Link do deploy | Pendente |
+| Link do deploy | [ThinDesk no Render](https://thindesk-chamados.onrender.com/) |
 | Credenciais de demonstração do deploy | Pendentes |
