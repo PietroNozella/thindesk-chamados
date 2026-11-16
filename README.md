@@ -59,7 +59,7 @@ Nesta versão, `1` identifica a primeira versão principal; os dois zeros indica
 
 ## Dashboard
 
-Captura da aplicação executando localmente, com dados fictícios de validação persistidos no MongoDB. As quantidades variam conforme os chamados cadastrados.
+Captura da aplicação executando localmente com o perfil Administrador e dados fictícios de validação. As quantidades variam conforme os chamados cadastrados. O perfil Professor da conta de demonstração também pode consultar o dashboard.
 
 ![Dashboard do Thindesk com total de chamados e contagens por status](docs/images/dashboard.png)
 
@@ -134,6 +134,16 @@ O script verifica chamados, conflitos entre operações, clientes, horários, ca
 
 **Deploy público** — [Acessar o ThinDesk no Render](https://thindesk-chamados.onrender.com/)
 
+### Acesso de demonstração
+
+| Campo | Valor |
+| --- | --- |
+| Usuário | `demonstracao` |
+| Senha | `ThinDesk-Demo26!` |
+| Perfil | Professor |
+
+A conta permite consultar o dashboard e a lista de chamados. No primeiro acesso, revise o Termo de Uso e a Política de Privacidade e registre o aceite para continuar.
+
 ### Hospedagem gratuita
 
 A aplicação usa um **Web Service Free do Render** para Java 21 e um **cluster M0 gratuito do MongoDB Atlas** para os dados. O `render.yaml` define `plan: free` explicitamente, sem discos, bancos ou outros serviços pagos no Render.
@@ -149,7 +159,7 @@ Para publicar:
 3. Preencha os valores solicitados para `MONGODB_URI`, `APP_ADMIN_USERNAME`, `APP_ADMIN_PASSWORD` e `APP_ADMIN_EMAIL`. Use uma senha própria para o administrador. Esses valores ficam nas configurações do Render, fora do Git e da imagem.
 4. Na página do serviço do Render, consulte os intervalos de IP de saída e adicione-os à lista de acesso do Atlas. A conexão ao banco só funciona quando a rede e o usuário estão autorizados. Veja [Outbound IP Addresses](https://render.com/docs/outbound-ip-addresses) e [IP Access List do Atlas](https://www.mongodb.com/docs/atlas/security/ip-access-list/).
 5. Aguarde o deploy. Valide o login, o aceite, a criação e a edição de chamados pelo endereço HTTPS recebido. O healthcheck em `/esqueci-senha` verifica apenas a resposta HTTP, sem criar sessões; ele não substitui o teste do banco.
-6. Cadastre uma conta de demonstração com perfil Operador e registre o endereço e as credenciais de demonstração abaixo. Guarde as credenciais de administrador em local privado.
+6. Cadastre uma conta de demonstração com perfil Professor e registre as credenciais de demonstração nesta seção. Guarde as credenciais de administrador em local privado.
 
 Os segredos com `sync: false` são solicitados na criação do Blueprint. Para adicionar ou alterar segredos depois, use as configurações de ambiente do serviço no Render. A conta administradora inicial não tem a senha alterada automaticamente por um novo deploy.
 
@@ -176,17 +186,10 @@ Na validação local da imagem, 63 verificações integradas passaram sob limite
 Repositório individual: [PietroNozella/thindesk-chamados](https://github.com/PietroNozella/thindesk-chamados).
 A `main` contém a aplicação com interface e os arquivos de configuração da hospedagem.
 
-Para concluir a entrega:
-
-- Criar uma conta de demonstração com perfil Operador em **Usuários → Cadastrar usuário**.
-- Registrar aqui as credenciais de demonstração, mantendo em privado a conta administradora e as credenciais do banco.
-- Testar o login e o fluxo de chamados pelo endereço público em janela anônima.
-- Conferir que o código do GitHub, a aplicação publicada e o ZIP solicitado correspondem à mesma versão.
-
 | Item da entrega | Situação |
 | --- | --- |
 | GitHub individual | Aplicação e configuração de hospedagem na `main` |
 | Versão e explicação | Documentadas neste README |
 | Print do dashboard | Incluído acima |
 | Link do deploy | [ThinDesk no Render](https://thindesk-chamados.onrender.com/) |
-| Credenciais de demonstração do deploy | Pendentes |
+| Credenciais de demonstração do deploy | Documentadas em [Acesso de demonstração](#acesso-de-demonstração) |
